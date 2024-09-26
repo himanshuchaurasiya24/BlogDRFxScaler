@@ -11,16 +11,18 @@ class RegisterView(APIView):
             if not serializer.is_valid():
                 return Response({'message':'somthing went wrong',
                 "data":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            # serializer.create(serializer.data)
             serializer.save()
             return Response({'message':'account has been created.','data':serializer.data}, 
             status=status.HTTP_201_CREATED)
 
         except Exception as e:
-            return Response({'message':'some error has occured.'}, status= status.HTTP_400_BAD_REQUEST)
+            return Response({'message':'some error has occured.', 'data':str(e)}, status= status.HTTP_400_BAD_REQUEST)
 class LoginView(APIView):
     def post(self, request):
         try:
             data = request.data
+            print(data['password'])
             serializer= LoginSerializer(data=data)
             if not serializer.is_valid():
                 return Response({
@@ -28,6 +30,7 @@ class LoginView(APIView):
                     'message':'somthing went wrong.'
                 }, status=status.HTTP_400_BAD_REQUEST)
             response = serializer.get_jwt_token(serializer.data)
+            print(response)
             return Response(response, status=status.HTTP_202_ACCEPTED)
         except Exception as e:
             print(e)

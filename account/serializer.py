@@ -25,8 +25,10 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('account not found.')
         return data
     def get_jwt_token(self, data):
+        # print(data['password'])
         user = authenticate(username = data['username'], 
                             password= data['password'])
+        # print(user)
         if not user :
             return {'message':'invalid credentials', 'data':{}}
         refresh = RefreshToken.for_user(user)
