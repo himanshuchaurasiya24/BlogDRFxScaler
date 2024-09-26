@@ -1,0 +1,72 @@
+install djangorestframework
+in api.urls that will be outside the project folder include all the routes for the api's
+in main app urls.py add route like 
+path('api/', include('api.urls')) # import include from the Django.urls
+
+in settings.py add the following code for jwt authentication
+REST_FRAMEWORK = {
+    
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+    
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+    
+}
+
+SERIALIZER.PY FILE IN ANOTHER APP
+
+in registerserializer define a validate method for validating the data entered by the front-end
+create a create function to save the data for registration
+in loginserializer define a validate function too same as register function and 
+create a jwtauthtoken method like this...
+
+def get_jwt_token(self, data):
+        user = authenticate(username = data['username'], 
+                            password= data['password'])
+        if not user :
+            return {'message':'invalid credentials', 'data':{}}
+        refresh = RefreshToken.for_user(user)
+        return {'message':'login_success',
+                'data':{
+                    'token':{
+                        'refresh': str(refresh),
+        'access': str(refresh.access_token),}}}
+
+
+VIEWS.PY 
+in registerView which is an APIView class from restframework.views
+define a post method in it check the request.data and check it from the serializer and if it is valid serializer.save()
+in loginView which is also an apiview class define a post method which will check for the existance of an user by checking the data provided by the front-end
+if its valid then after failure statement of the serializer write the below code
+
+response = serializer.get_jwt_token(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
