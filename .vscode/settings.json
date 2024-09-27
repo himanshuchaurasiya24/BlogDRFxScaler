@@ -1,0 +1,7 @@
+{
+    "terminal.integrated.mouseWheelZoom": true,
+    "editor.mouseWheelZoom": true,
+    "window.zoomLevel": 2,
+    "terminal.integrated.fontSize": 18
+    
+}
