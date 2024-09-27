@@ -3,5 +3,6 @@ from .models import Blog
 class BlogSerializer(serializers.ModelSerializer):
     class Meta:
         model = Blog
+        # fields='__all__'
         exclude = ['created_at', 'updated_at']
         
