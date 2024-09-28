@@ -4,6 +4,7 @@ import 'package:blog_frontend/components/custom_scaffold.dart';
 import 'package:blog_frontend/components/custom_text_field.dart';
 import 'package:blog_frontend/components/glass_morphism.dart';
 import 'package:blog_frontend/models/login_model.dart';
+import 'package:blog_frontend/screens/home.dart';
 import 'package:blog_frontend/screens/registration.dart';
 import 'package:flutter/material.dart';
 
@@ -64,23 +65,32 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: MediaQuery.of(context).size.width,
                         child: TextButton(
                           onPressed: () async {
+                            BuildContext myContext = context;
                             setState(() {
                               _isLoading = true;
-                              ApiServices()
-                                  .login(
-                                      model: LoginModel(
-                                          username: usernameController.text,
-                                          password: passwordController.text))
-                                  .then(
-                                (value) {
-                                  setState(() {
-                                    _isLoading = false;
-                                  });
-                                  debugPrint(
-                                      value.data!.token!.access.toString());
-                                },
-                              );
                             });
+                            await ApiServices()
+                                .login(
+                                    model: LoginModel(
+                                        username: usernameController.text,
+                                        password: passwordController.text))
+                                .then(
+                              (value) {
+                                setState(() {
+                                  _isLoading = false;
+                                  usernameController.text='';
+                                  passwordController.text='';
+                                });
+                                if (value.data!.token!.access!.isNotEmpty) {
+                                  Navigator.pushReplacement(
+                                    myContext,
+                                    CustomPageRoute(
+                                      route: const Home(),
+                                    ),
+                                  );
+                                }
+                              },
+                            );
                           },
                           child: _isLoading
                               ? const Center(

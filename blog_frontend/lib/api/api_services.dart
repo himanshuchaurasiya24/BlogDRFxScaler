@@ -27,7 +27,7 @@ class ApiServices {
   }
 
   Future<LoginTokenModel> login({required LoginModel model}) async {
-    final response = await http
+    var response = await http
         .post(Uri.parse('http://127.0.0.1:8000/api/account/login/'), body: {
       'username': model.username,
       'password': model.password,

@@ -3,6 +3,7 @@
 import 'package:blog_frontend/screens/home.dart';
 import 'package:blog_frontend/screens/login_screen.dart';
 import 'package:blog_frontend/screens/registration.dart';
+import 'package:blog_frontend/splash_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -50,7 +51,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: const LoginScreen(),
+      home: const SplashScreen(),
     );
   }
 }

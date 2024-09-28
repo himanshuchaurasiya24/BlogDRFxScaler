@@ -1,6 +1,8 @@
+import 'package:blog_frontend/api/api_services.dart';
 import 'package:blog_frontend/components/custom_page_route.dart';
 import 'package:blog_frontend/components/custom_scaffold.dart';
 import 'package:blog_frontend/components/glass_morphism.dart';
+import 'package:blog_frontend/models/registration_model.dart';
 import 'package:blog_frontend/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -74,10 +76,32 @@ class _RegistrationState extends State<Registration> {
                         height: MediaQuery.of(context).size.height * 0.08,
                         width: MediaQuery.of(context).size.width,
                         child: TextButton(
-                          onPressed: () {
+                          onPressed: () async {
                             setState(() {
                               _isLoading = true;
                             });
+                            await ApiServices()
+                                .register(
+                              model: RegistrationModel(
+                                username: usernameController.text,
+                                firstName: firstNameController.text,
+                                lastName: lastNameController.text,
+                                password: passwordController.text,
+                              ),
+                            )
+                                .then(
+                              (value) {
+                                setState(() {
+                                  _isLoading = false;
+
+                                  usernameController.text='';
+                                  passwordController.text='';
+                                  firstNameController.text='';
+                                  lastNameController.text='';
+                                });
+                                debugPrint(value.message);
+                              },
+                            );
                           },
                           child: _isLoading
                               ? const Center(
