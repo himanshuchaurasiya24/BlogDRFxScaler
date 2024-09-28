@@ -12,15 +12,9 @@ class RegisterView(APIView):
                 return Response({'message':'somthing went wrong',
                 "data":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
             # serializer.create(serializer.data)
-            serializer.save()
-            obj= User.objects.all()
-            for o in obj:
-                print(o.first_name)
-                print(o.last_name)
-                
+            serializer.create(validated_data=serializer.validate(data=data))
             return Response({'message':'account has been created.','data':serializer.data}, 
             status=status.HTTP_201_CREATED)
-
         except Exception as e:
             return Response({'message':'some error has occured.', 'data':str(e)}, status= status.HTTP_400_BAD_REQUEST)
 class LoginView(APIView):

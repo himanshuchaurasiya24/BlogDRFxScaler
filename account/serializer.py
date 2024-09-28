@@ -16,6 +16,7 @@ class RegisterSerializer(serializers.Serializer):
                                    last_name = validated_data['last_name'],
                                    username = validated_data['username'].lower())
         user.set_password(validated_data['password'])
+        user.save()
         return validated_data
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
