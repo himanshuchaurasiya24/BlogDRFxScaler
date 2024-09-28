@@ -29,7 +29,7 @@ class LoginSerializer(serializers.Serializer):
         user = authenticate(username = data['username'], 
                             password= data['password'])
         if not user :
-            return {'message':'invalid credentials', 'data':{}}
+            return {'message':'invalid credentials', 'data':{'token':{'refresh':'', 'access':''}}}
         refresh = RefreshToken.for_user(user)
         return {'message':'login_success',
                 'data':{

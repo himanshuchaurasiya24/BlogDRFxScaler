@@ -29,8 +29,10 @@ class LoginView(APIView):
                     'message':'somthing went wrong.'
                 }, status=status.HTTP_400_BAD_REQUEST)
             response = serializer.get_jwt_token(serializer.data)
-            # print(response)
-            return Response(response, status=status.HTTP_202_ACCEPTED)
+            if not response['message']=='invalid credentials':
+                return Response(response, status=status.HTTP_202_ACCEPTED)
+            else:
+                return Response(response, status=status.HTTP_401_UNAUTHORIZED)
         except Exception as e:
             # print(e)
             return Response({'data':{},
