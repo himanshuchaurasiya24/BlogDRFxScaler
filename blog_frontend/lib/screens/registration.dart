@@ -94,12 +94,28 @@ class _RegistrationState extends State<Registration> {
                                 setState(() {
                                   _isLoading = false;
 
-                                  usernameController.text='';
-                                  passwordController.text='';
-                                  firstNameController.text='';
-                                  lastNameController.text='';
+                                  usernameController.text = '';
+                                  passwordController.text = '';
+                                  firstNameController.text = '';
+                                  lastNameController.text = '';
                                 });
-                                debugPrint(value.message);
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context)
+                                      .showMaterialBanner(
+                                    MaterialBanner(
+                                        content: Text(value.message ?? ''),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              ScaffoldMessenger.of(context)
+                                                  .hideCurrentMaterialBanner();
+                                            },
+                                            child: const Text('Okay'),
+                                          ),
+                                        ]),
+                                  );
+                                }
+                                // debugPrint(value.message);
                               },
                             );
                           },
