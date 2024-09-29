@@ -6,7 +6,7 @@ class CustomTextField extends StatefulWidget {
     required this.context,
     required this.hintText,
     required this.controller,
-    this.passwordField=false,
+    this.passwordField = false,
   });
   final BuildContext context;
   final String hintText;
@@ -25,10 +25,19 @@ class _CustomTextFieldState extends State<CustomTextField> {
         const SizedBox(
           height: 10,
         ),
-        TextField(
+        TextFormField(
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter some text';
+            }
+            return null;
+          },
           controller: widget.controller,
-          obscureText:widget.passwordField? !isPasswordVisible:false,
+          obscureText: widget.passwordField ? !isPasswordVisible : false,
           decoration: InputDecoration(
+            errorStyle: const TextStyle(
+              color: Colors.white70,
+            ),
             hintText: widget.hintText,
             suffixIcon: widget.passwordField
                 ? IconButton(

@@ -19,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   bool _isLoading = false;
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
@@ -37,108 +38,138 @@ class _LoginScreenState extends State<LoginScreen> {
               width: MediaQuery.of(context).size.width / 1.1,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Please enter your credentials for Login',
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    CustomTextField(
-                      context: context,
-                      hintText: 'Username',
-                      controller: usernameController,
-                    ),
-                    CustomTextField(
-                      context: context,
-                      hintText: 'password',
-                      controller: passwordController,
-                      passwordField: true,
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    GlassMorphism(
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.08,
-                        width: MediaQuery.of(context).size.width,
-                        child: TextButton(
-                          onPressed: () async {
-                            BuildContext myContext = context;
-                            setState(() {
-                              _isLoading = true;
-                            });
-                            await ApiServices()
-                                .login(
-                                    model: LoginModel(
-                                        username: usernameController.text,
-                                        password: passwordController.text))
-                                .then(
-                              (value) {
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Please enter your credentials for Login',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      CustomTextField(
+                        context: context,
+                        hintText: 'Username',
+                        controller: usernameController,
+                      ),
+                      CustomTextField(
+                        context: context,
+                        hintText: 'password',
+                        controller: passwordController,
+                        passwordField: true,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      GlassMorphism(
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.08,
+                          width: MediaQuery.of(context).size.width,
+                          child: TextButton(
+                            onPressed: () async {
+                              debugPrint('tapped');
+                              if (_formKey.currentState!.validate()) {
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentMaterialBanner();
                                 setState(() {
-                                  _isLoading = false;
-                                  usernameController.text='';
-                                  passwordController.text='';
+                                  _isLoading = true;
                                 });
-                                if (value.data!.token!.access!.isNotEmpty) {
-                                  Navigator.pushReplacement(
-                                    myContext,
-                                    CustomPageRoute(
-                                      route: const Home(),
+                                await ApiServices()
+                                    .login(
+                                        model: LoginModel(
+                                            username: usernameController.text,
+                                            password: passwordController.text))
+                                    .then(
+                                  (value) {
+                                    setState(() {
+                                      _isLoading = false;
+                                      usernameController.text = '';
+                                      passwordController.text = '';
+                                    });
+                                    if (value.data!.token!.access!.isNotEmpty) {
+                                      if (context.mounted) {
+                                        Navigator.pushReplacement(
+                                          context,
+                                          CustomPageRoute(
+                                            route: const Home(),
+                                          ),
+                                        );
+                                      }
+                                    } else {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showMaterialBanner(
+                                          MaterialBanner(
+                                              backgroundColor: Colors.red,
+                                              content: Text(value.message!),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .hideCurrentMaterialBanner();
+                                                  },
+                                                  child: const Text(
+                                                    'Okay',
+                                                  ),
+                                                ),
+                                              ]),
+                                        );
+                                      }
+                                    }
+                                  },
+                                );
+                              }
+                            },
+                            child: _isLoading
+                                ? const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white70,
+                                      strokeWidth: 6,
                                     ),
-                                  );
-                                }
-                              },
-                            );
-                          },
-                          child: _isLoading
-                              ? const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white70,
-                                    strokeWidth: 6,
+                                  )
+                                : Text(
+                                    'Login',
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineMedium,
                                   ),
-                                )
-                              : Text(
-                                  'Login',
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .headlineMedium,
-                                ),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Don\'t have an account ?',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              CustomPageRoute(
-                                route: const Registration(),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            'Register here',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall!
-                                .copyWith(fontWeight: FontWeight.bold),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Don\'t have an account ?',
+                            style: Theme.of(context).textTheme.bodySmall,
                           ),
-                        )
-                      ],
-                    )
-                  ],
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                CustomPageRoute(
+                                  route: const Registration(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'Register here',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
