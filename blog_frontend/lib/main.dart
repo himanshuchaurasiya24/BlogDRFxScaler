@@ -5,8 +5,12 @@ import 'package:blog_frontend/screens/login_screen.dart';
 import 'package:blog_frontend/screens/registration.dart';
 import 'package:blog_frontend/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+late SharedPreferences pref;
+void main() async {
+  pref = await SharedPreferences.getInstance();
+
   runApp(const MyApp());
 }
 

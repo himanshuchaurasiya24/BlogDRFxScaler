@@ -35,15 +35,13 @@ class ApiServices {
     debugPrint(response.statusCode.toString());
     if (response.statusCode == 202) {
       return LoginTokenModel.fromJson(jsonDecode(response.body));
-    } else if (response.statusCode == 401) {
+    } else {
       return LoginTokenModel.fromJson({
         "message": "invalid credentials",
         "data": {
           "token": {"refresh": "", "access": ""}
         }
       });
-    } else {
-      return LoginTokenModel.fromJson(jsonDecode(response.body));
     }
   }
 }

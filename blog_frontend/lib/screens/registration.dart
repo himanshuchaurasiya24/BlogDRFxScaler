@@ -110,28 +110,25 @@ class _RegistrationState extends State<Registration> {
                                         ScaffoldMessenger.of(context)
                                             .showMaterialBanner(
                                           MaterialBanner(
-                                              contentTextStyle: const TextStyle(
-                                                color: Colors.white70,
-                                                fontSize: 45,
-                                                fontFamily: 'Ubuntu-Regular',
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              dividerColor: Colors.transparent,
-                                              shadowColor: Colors.transparent,
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              content:
-                                                  Text(value.message ?? ''),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () {
-                                                    ScaffoldMessenger.of(
-                                                            context)
-                                                        .hideCurrentMaterialBanner();
-                                                  },
-                                                  child: const Text('Okay'),
-                                                ),
-                                              ]),
+                                                dividerColor:
+                                                    Colors.transparent,
+                                                backgroundColor: Colors.red,
+                                                content: Text(value.message!),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .hideCurrentMaterialBanner();
+                                                    },
+                                                    child: Text(
+                                                      'Okay',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .bodyMedium,
+                                                    ),
+                                                  ),
+                                                ]),
                                         );
                                       }
                                     },
