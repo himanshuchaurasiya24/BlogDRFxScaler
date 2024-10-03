@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 String at = '';
 late SharedPreferences pref;
+
 void main() async {
   pref = await SharedPreferences.getInstance();
 
@@ -61,10 +62,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: Home(
-        accessToken: at,
-        username: 3.toString(),
-      ),
+      home: const LoginScreen(),
     );
   }
 }

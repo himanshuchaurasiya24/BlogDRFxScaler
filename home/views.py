@@ -39,7 +39,9 @@ class BlogView(APIView):
                 print(search)
                 object = object.filter(Q(title__icontains= search)| Q(blog_text__icontains=search))
             serializer = BlogSerializer(object, many=True)
-            return Response (serializer.data)
+            return Response ({'data':serializer.data, 
+                              'message':'blog fetched successfully', } ,
+                             status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'message':"Something exceptional has occured", 
                              'data':e,'username':request.user}, 
