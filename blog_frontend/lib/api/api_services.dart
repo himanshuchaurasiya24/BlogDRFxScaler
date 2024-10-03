@@ -7,11 +7,12 @@ import 'package:blog_frontend/models/registration_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+const apiLink = 'http://127.0.0.1:8000/';
+
 class ApiServices {
   Future<RegistrationAcceptedModel> register(
       {required RegistrationModel model}) async {
-    var response = await http
-        .post(Uri.parse('http://127.0.0.1:8000/api/account/register/'), body: {
+    var response = await http.post(Uri.parse('${apiLink}api/account/register/'), body: {
       'first_name': model.firstName,
       'last_name': model.lastName,
       'username': model.username,
@@ -28,7 +29,7 @@ class ApiServices {
 
   Future<LoginTokenModel> login({required LoginModel model}) async {
     var response = await http
-        .post(Uri.parse('http://127.0.0.1:8000/api/account/login/'), body: {
+        .post(Uri.parse('${apiLink}api/account/login/'), body: {
       'username': model.username,
       'password': model.password,
     });
