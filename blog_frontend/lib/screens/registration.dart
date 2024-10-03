@@ -22,6 +22,62 @@ class _RegistrationState extends State<Registration> {
   final lastNameController = TextEditingController();
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
+  void onFieldSubmitted() async {
+    ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      await ApiServices()
+          .register(
+        model: RegistrationModel(
+          username: usernameController.text,
+          firstName: firstNameController.text,
+          lastName: lastNameController.text,
+          password: passwordController.text,
+        ),
+      )
+          .then(
+        (value) {
+          setState(() {
+            _isLoading = false;
+
+            usernameController.text = '';
+            passwordController.text = '';
+            firstNameController.text = '';
+            lastNameController.text = '';
+          });
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showMaterialBanner(
+              MaterialBanner(
+                  dividerColor: Colors.transparent,
+                  backgroundColor: value.message == 'account has been created.'
+                      ? Colors.green
+                      : Colors.red,
+                  content: Text(value.message!),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context)
+                            .hideCurrentMaterialBanner();
+                        if (value.message == 'account has been created.') {
+                          Navigator.push(context,
+                              CustomPageRoute(route: const LoginScreen()));
+                        }
+                      },
+                      child: Text(
+                        'Okay',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                  ]),
+            );
+          }
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
@@ -65,12 +121,18 @@ class _RegistrationState extends State<Registration> {
                           context: context,
                           hintText: 'Username',
                           controller: usernameController,
+                          onFieldSubmitted: (p0) {
+                            onFieldSubmitted();
+                          },
                         ),
                         CustomTextField(
                           context: context,
                           hintText: 'password',
                           controller: passwordController,
                           passwordField: true,
+                          onFieldSubmitted: (p0) {
+                            onFieldSubmitted();
+                          },
                         ),
                         const SizedBox(
                           height: 20,
@@ -81,59 +143,7 @@ class _RegistrationState extends State<Registration> {
                             width: MediaQuery.of(context).size.width,
                             child: TextButton(
                               onPressed: () async {
-                                ScaffoldMessenger.of(context)
-                                    .hideCurrentMaterialBanner();
-                                if (_formKey.currentState!.validate()) {
-                                  setState(() {
-                                    _isLoading = true;
-                                  });
-                                  await ApiServices()
-                                      .register(
-                                    model: RegistrationModel(
-                                      username: usernameController.text,
-                                      firstName: firstNameController.text,
-                                      lastName: lastNameController.text,
-                                      password: passwordController.text,
-                                    ),
-                                  )
-                                      .then(
-                                    (value) {
-                                      setState(() {
-                                        _isLoading = false;
-
-                                        usernameController.text = '';
-                                        passwordController.text = '';
-                                        firstNameController.text = '';
-                                        lastNameController.text = '';
-                                      });
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showMaterialBanner(
-                                          MaterialBanner(
-                                                dividerColor:
-                                                    Colors.transparent,
-                                                backgroundColor: Colors.red,
-                                                content: Text(value.message!),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .hideCurrentMaterialBanner();
-                                                    },
-                                                    child: Text(
-                                                      'Okay',
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .bodyMedium,
-                                                    ),
-                                                  ),
-                                                ]),
-                                        );
-                                      }
-                                    },
-                                  );
-                                }
+                                onFieldSubmitted();
                               },
                               child: _isLoading
                                   ? const Center(

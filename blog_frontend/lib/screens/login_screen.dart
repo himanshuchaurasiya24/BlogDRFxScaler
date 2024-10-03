@@ -23,7 +23,64 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   void setAccessToken({required String accessToken}) {
     pref.setString('at', accessToken);
-    debugPrint('accessToken is: ${pref.getString('at')!}');
+  }
+
+  void onFieldSubmitted() async {
+    if (_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+      setState(() {
+        _isLoading = true;
+      });
+      await ApiServices()
+          .login(
+              model: LoginModel(
+                  username: usernameController.text,
+                  password: passwordController.text))
+          .then(
+        (value) {
+          setState(() {
+            _isLoading = false;
+            passwordController.text = '';
+          });
+          if (value.data!.token!.access!.isNotEmpty) {
+            setAccessToken(accessToken: value.data!.token!.access!);
+
+            if (context.mounted) {
+              Navigator.pushReplacement(
+                context,
+                CustomPageRoute(
+                  route: Home(
+                    accessToken: value.data!.token!.access!,
+                    username: usernameController.text.toLowerCase(),
+                  ),
+                ),
+              );
+            }
+          } else {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showMaterialBanner(
+                MaterialBanner(
+                    dividerColor: Colors.transparent,
+                    backgroundColor: Colors.red,
+                    content: Text(value.message!),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context)
+                              .hideCurrentMaterialBanner();
+                        },
+                        child: Text(
+                          'Okay',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                    ]),
+              );
+            }
+          }
+        },
+      );
+    }
   }
 
   @override
@@ -59,12 +116,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           context: context,
                           hintText: 'Username',
                           controller: usernameController,
+                          onFieldSubmitted: (p0) {
+                            onFieldSubmitted();
+                          },
                         ),
                         CustomTextField(
                           context: context,
                           hintText: 'password',
                           controller: passwordController,
                           passwordField: true,
+                          onFieldSubmitted: (p0) {
+                            onFieldSubmitted();
+                          },
                         ),
                         const SizedBox(
                           height: 20,
@@ -75,70 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             width: MediaQuery.of(context).size.width,
                             child: TextButton(
                               onPressed: () async {
-                                debugPrint('tapped');
-                                if (_formKey.currentState!.validate()) {
-                                  ScaffoldMessenger.of(context)
-                                      .hideCurrentMaterialBanner();
-                                  setState(() {
-                                    _isLoading = true;
-                                  });
-                                  await ApiServices()
-                                      .login(
-                                          model: LoginModel(
-                                              username: usernameController.text,
-                                              password:
-                                                  passwordController.text))
-                                      .then(
-                                    (value) {
-                                      setState(() {
-                                        _isLoading = false;
-                                        usernameController.text = '';
-                                        passwordController.text = '';
-                                      });
-                                      if (value
-                                          .data!.token!.access!.isNotEmpty) {
-                                        setAccessToken(
-                                            accessToken:
-                                                value.data!.token!.access!);
-
-                                        if (context.mounted) {
-                                          Navigator.pushReplacement(
-                                            context,
-                                            CustomPageRoute(
-                                              route:  Home(accessToken: value.data!.token!.access!,),
-                                            ),
-                                          );
-                                        }
-                                      } else {
-                                        if (context.mounted) {
-                                          ScaffoldMessenger.of(context)
-                                              .showMaterialBanner(
-                                            MaterialBanner(
-                                                dividerColor:
-                                                    Colors.transparent,
-                                                backgroundColor: Colors.red,
-                                                content: Text(value.message!),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .hideCurrentMaterialBanner();
-                                                    },
-                                                    child: Text(
-                                                      'Okay',
-                                                      style: Theme.of(context)
-                                                          .textTheme
-                                                          .bodyMedium,
-                                                    ),
-                                                  ),
-                                                ]),
-                                          );
-                                        }
-                                      }
-                                    },
-                                  );
-                                }
+                                onFieldSubmitted();
                               },
                               child: _isLoading
                                   ? const Center(

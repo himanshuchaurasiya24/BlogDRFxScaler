@@ -7,6 +7,7 @@ import 'package:blog_frontend/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+String at = '';
 late SharedPreferences pref;
 void main() async {
   pref = await SharedPreferences.getInstance();
@@ -16,12 +17,17 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  Future<void> getAt() async {
+    at = pref.getString('at') ?? '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.grey[300],
+        appBarTheme: AppBarTheme(backgroundColor: Colors.grey[300]),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
         textTheme: const TextTheme(
@@ -55,7 +61,10 @@ class MyApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: const LoginScreen(),
+      home: Home(
+        accessToken: at,
+        username: 3.toString(),
+      ),
     );
   }
 }

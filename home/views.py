@@ -21,7 +21,7 @@ class PublicBlogView(APIView):
             serializer=BlogSerializer(paginator.page(page_number), 
                                       many=True)
             return Response ({'data':serializer.data, 
-                              'message':'blog fetched successfully'} ,
+                              'message':'blog fetched successfully', } ,
                              status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'message':"Something exceptional has occured", 
@@ -42,7 +42,7 @@ class BlogView(APIView):
             return Response (serializer.data)
         except Exception as e:
             return Response({'message':"Something exceptional has occured", 
-                             'data':e}, 
+                             'data':e,'username':request.user}, 
                             status=status.HTTP_400_BAD_REQUEST)
     def post(self, request):
         try:

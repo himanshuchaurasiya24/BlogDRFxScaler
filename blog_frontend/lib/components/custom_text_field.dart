@@ -6,12 +6,14 @@ class CustomTextField extends StatefulWidget {
     required this.context,
     required this.hintText,
     required this.controller,
-    this.passwordField = false,
+    this.passwordField = false, 
+    this.onFieldSubmitted,
   });
   final BuildContext context;
   final String hintText;
   final TextEditingController controller;
   final bool passwordField;
+  final Function(String?)? onFieldSubmitted;
   @override
   State<CustomTextField> createState() => _CustomTextFieldState();
 }
@@ -26,6 +28,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           height: 10,
         ),
         TextFormField(
+          onFieldSubmitted: widget.onFieldSubmitted,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please enter some text';
