@@ -11,6 +11,8 @@ import 'package:http/http.dart' as http;
 const apiLink = 'http://127.0.0.1:8000/';
 
 class ApiServices {
+  
+
   Future<List<BlogModel>> fetchPublicBlogList() async {
     var response = await http.get(Uri.parse('$apiLink/api/home/blog'));
     if (response.statusCode == 200) {

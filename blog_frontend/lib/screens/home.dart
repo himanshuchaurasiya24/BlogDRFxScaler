@@ -13,8 +13,9 @@
 // import 'dart:io';
 import 'package:blog_frontend/components/custom_page_route.dart';
 import 'package:blog_frontend/main.dart';
+import 'package:blog_frontend/screens/add_new_blog_screen.dart';
 import 'package:blog_frontend/screens/bottomNavScreens/profile_bottom.dart';
-import 'package:blog_frontend/screens/home_bottom.dart';
+import 'package:blog_frontend/screens/bottomNavScreens/home_bottom.dart';
 import 'package:blog_frontend/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -72,7 +73,12 @@ class _HomeState extends State<Home> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            //
+            Navigator.push(
+              context,
+              CustomPageRoute(
+                route: const AddNewBlogScreen(),
+              ),
+            );
           },
           label: const Text('new blog'),
           icon: const Icon(Icons.add),
