@@ -22,7 +22,6 @@ class LoginView(APIView):
     def post(self, request):
         try:
             data = request.data
-            # print(data['password'])
             serializer= LoginSerializer(data=data)
             if not serializer.is_valid():
                 return Response({

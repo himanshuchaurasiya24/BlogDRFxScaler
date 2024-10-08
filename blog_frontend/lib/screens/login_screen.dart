@@ -21,8 +21,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final passwordController = TextEditingController();
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
-  void setAccessToken({required String accessToken}) {
+  void setAccessToken({required String accessToken, required int user}) {
     pref.setString('at', accessToken);
+    pref.setInt('user', user);
   }
 
   void onFieldSubmitted() async {
@@ -42,15 +43,17 @@ class _LoginScreenState extends State<LoginScreen> {
             _isLoading = false;
             passwordController.text = '';
           });
-          if (value.data!.token!.access!.isNotEmpty) {
-            setAccessToken(accessToken: value.data!.token!.access!);
+          if (value['data']['token']['access'].isNotEmpty) {
+            setAccessToken(
+                accessToken: value['data']['token']['access'],
+                user: value['user']);
 
             if (context.mounted) {
               Navigator.pushReplacement(
                 context,
                 CustomPageRoute(
                   route: Home(
-                    accessToken: value.data!.token!.access!,
+                    accessToken: value['data']['token']['access'],
                     username: usernameController.text.toLowerCase(),
                   ),
                 ),
@@ -62,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 MaterialBanner(
                     dividerColor: Colors.transparent,
                     backgroundColor: Colors.red,
-                    content: Text(value.message!),
+                    content: Text(value['message']),
                     actions: [
                       TextButton(
                         onPressed: () {
