@@ -1,43 +1,34 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:blog_frontend/main.dart';
 import 'package:blog_frontend/models/blog_model.dart';
 import 'package:blog_frontend/models/login_model.dart';
 import 'package:blog_frontend/models/registration_accepted_model.dart';
 import 'package:blog_frontend/models/registration_model.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 const apiLink = 'http://127.0.0.1:8000/';
 
 class ApiServices {
-  Future<dynamic> postBlog(
+  Future<void> uploadBlog(
       {required String title,
       required String blogText,
-      required int user,
-      required File file}) async {
-    var formData = FormData.fromMap({
-      'title': title,
-      'blog_text': blogText,
-      'main_image': await MultipartFile.fromFile(file.path, filename: title),
-      'user': user
-    });
-    final response = await Dio().post(
-      '$apiLink+api/home/blog-user/',
-      data: formData,
-    );
-    if (response.statusCode == 201) {
-      var raw = jsonDecode(response.data['data']);
-      return BlogModel.fromJson(raw);
-    }
-    var rawError = jsonDecode(response.data['message']);
-    return rawError;
+      required File selectedImage}) async {
+    int user = pref.getInt('user') ?? 0;
+    String at = pref.getString('at') ?? '';
+    var request = http.MultipartRequest(
+        "POST", Uri.parse('${apiLink}api/home/blog-user/'));
+    request.fields['title'] = title;
+    request.fields['blog_text'] = blogText;
+    request.fields['user'] = user.toString();
+    request.headers['Authorization'] = 'Bearer $at';
+    request.files.add(
+        await http.MultipartFile.fromPath('main_image', selectedImage.path));
+    await request.send();
   }
 
   Future<List<BlogModel>> fetchPublicBlogList() async {
-    var response = await http.get(Uri.parse('$apiLink/api/home/blog'));
+    var response = await http.get(Uri.parse('$apiLink/api/home/blog/'));
     if (response.statusCode == 200) {
       var contentRaw = jsonDecode(response.body);
       var blog = contentRaw['data'] as List;
@@ -49,12 +40,10 @@ class ApiServices {
 
   Future<List<BlogModel>> fetchUserBlogList() async {
     String at = pref.getString('at') ?? '';
-    debugPrint(at);
-    var response = await http.get(Uri.parse('${apiLink}api/home/blog-user'),
+    var response = await http.get(Uri.parse('${apiLink}api/home/blog-user/'),
         headers: {'Authorization': 'Bearer $at'});
     if (response.statusCode == 200) {
       var contentRaw = jsonDecode(response.body);
-      debugPrint(response.body.toString());
       var blog = contentRaw['data'] as List;
       return blog.map((e) => BlogModel.fromJson(e)).toList();
     } else {

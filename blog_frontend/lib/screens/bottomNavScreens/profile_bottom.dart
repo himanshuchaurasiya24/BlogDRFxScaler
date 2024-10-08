@@ -31,6 +31,10 @@ class _ProfileBottomState extends State<ProfileBottom> {
           itemCount: snapshot.data!.length,
           itemBuilder: (context, index) {
             return ListTile(
+              leading: Image.network(
+                apiLink + snapshot.data![index].mainImage!,
+                fit: BoxFit.scaleDown,
+              ),
               title: Text(
                   '${snapshot.data![index].title!} ${snapshot.data![index].user!.toString()}'),
               subtitle: Column(
@@ -39,7 +43,7 @@ class _ProfileBottomState extends State<ProfileBottom> {
                   Text(snapshot.data![index].blogText!),
                 ],
               ),
-              onTap: () async {
+              onLongPress: () async {
                 await ApiServices()
                     .deleteBlog(uid: snapshot.data![index].uid!)
                     .then(

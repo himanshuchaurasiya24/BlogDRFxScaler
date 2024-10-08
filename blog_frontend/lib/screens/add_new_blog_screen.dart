@@ -2,11 +2,8 @@ import 'dart:io';
 import 'package:blog_frontend/api/api_services.dart';
 import 'package:blog_frontend/components/custom_text_field.dart';
 import 'package:blog_frontend/components/glass_morphism.dart';
-import 'package:blog_frontend/main.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
 
 class AddNewBlogScreen extends StatefulWidget {
   const AddNewBlogScreen({super.key});
@@ -36,29 +33,31 @@ class _AddNewBlogScreenState extends State<AddNewBlogScreen> {
   }
 
   Future<void> uploadBlog() async {
-    int user = pref.getInt('user') ?? 0;
-    String at = pref.getString('at') ?? '';
     setState(() {
       isUploading = true;
     });
-    var request = http.MultipartRequest(
-        "POST", Uri.parse('${apiLink}api/home/blog-user/'));
-    request.fields['title'] = titleController.text;
-    request.fields['blog_text'] = blogTextController.text;
-    request.fields['user'] = user.toString();
-    request.headers['Authorization'] = 'Bearer $at';
-    debugPrint(at);
-    request.files.add(
-        await http.MultipartFile.fromPath('main_image', _selectedImage!.path));
-    var response = await request.send();
-    debugPrint(response.toString());
-    debugPrint(response.reasonPhrase);
-    debugPrint(response.stream.toString());
-    debugPrint(response.statusCode.toString());
-    debugPrint(response.headers.toString());
-    setState(() {
-      isUploading = false;
-    });
+    // var request = http.MultipartRequest(
+    //     "POST", Uri.parse('${apiLink}api/home/blog-user/'));
+    // request.fields['title'] = titleController.text;
+    // request.fields['blog_text'] = blogTextController.text;
+    // request.fields['user'] = user.toString();
+    // request.headers['Authorization'] = 'Bearer $at';
+    // debugPrint(at);
+    // request.files.add(
+    //     await http.MultipartFile.fromPath('main_image', _selectedImage!.path));
+    // await request.send();
+    await ApiServices()
+        .uploadBlog(
+            title: titleController.text,
+            blogText: blogTextController.text,
+            selectedImage: _selectedImage!)
+        .then(
+      (value) {
+        setState(() {
+          isUploading = false;
+        });
+      },
+    );
   }
 
   @override

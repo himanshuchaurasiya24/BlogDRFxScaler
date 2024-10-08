@@ -12,7 +12,6 @@ late SharedPreferences pref;
 
 void main() async {
   pref = await SharedPreferences.getInstance();
-
   runApp(const MyApp());
 }
 
