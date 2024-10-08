@@ -4,8 +4,8 @@ import 'package:blog_frontend/components/custom_text_field.dart';
 import 'package:blog_frontend/components/glass_morphism.dart';
 import 'package:blog_frontend/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:http/http.dart' as http;
 
 class AddNewBlogScreen extends StatefulWidget {
@@ -37,30 +37,25 @@ class _AddNewBlogScreenState extends State<AddNewBlogScreen> {
 
   Future<void> uploadBlog() async {
     int user = pref.getInt('user') ?? 0;
+    String at = pref.getString('at') ?? '';
     setState(() {
       isUploading = true;
     });
-    var stream = http.ByteStream(_selectedImage!.openRead());
-    stream.cast();
-    var length = await _selectedImage!.length();
-    var apilink = '${apiLink}api/home/blog-user/';
-    var url = Uri.parse(apilink);
     var request = http.MultipartRequest(
-      'POST',
-      url,
-    );
+        "POST", Uri.parse('${apiLink}api/home/blog-user/'));
     request.fields['title'] = titleController.text;
     request.fields['blog_text'] = blogTextController.text;
     request.fields['user'] = user.toString();
-    var multiport = http.MultipartFile('main_image', stream, length);
-    request.files.add(multiport);
-    request.headers.addAll({'Authorization':'Bearer $at'});
+    request.headers['Authorization'] = 'Bearer $at';
+    debugPrint(at);
+    request.files.add(
+        await http.MultipartFile.fromPath('main_image', _selectedImage!.path));
     var response = await request.send();
-    if (response.statusCode == 201) {
-      debugPrint('uploaded!');
-    } else {
-      debugPrint('failed');
-    }
+    debugPrint(response.toString());
+    debugPrint(response.reasonPhrase);
+    debugPrint(response.stream.toString());
+    debugPrint(response.statusCode.toString());
+    debugPrint(response.headers.toString());
     setState(() {
       isUploading = false;
     });
@@ -68,97 +63,94 @@ class _AddNewBlogScreenState extends State<AddNewBlogScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ModalProgressHUD(
-      inAsyncCall: isUploading,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Add a blog'),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Form(
-            key: _formkey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CustomTextField(
-                  context: context,
-                  hintText: 'title',
-                  controller: titleController,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add a blog'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Form(
+          key: _formkey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CustomTextField(
+                context: context,
+                hintText: 'title',
+                controller: titleController,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              CustomTextField(
+                context: context,
+                hintText: 'blog text',
+                controller: blogTextController,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Visibility(
+                visible: _selectedImage == null,
+                child: IconButton(
+                  onPressed: () {
+                    getImage();
+                  },
+                  icon: Row(
+                    children: [
+                      const Icon(
+                        Icons.add,
+                        size: 40,
+                        color: Colors.black87,
+                      ),
+                      Text(
+                        'Pick an image from here.',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium!
+                            .copyWith(color: Colors.black87),
+                      )
+                    ],
+                  ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                CustomTextField(
-                  context: context,
-                  hintText: 'blog text',
-                  controller: blogTextController,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Visibility(
-                  visible: _selectedImage == null,
-                  child: IconButton(
-                    onPressed: () {
-                      getImage();
+              ),
+              SizedBox(
+                height: 300,
+                width: 300,
+                child: _selectedImage != null
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedImage = null;
+                          });
+                        },
+                        child: Image.file(_selectedImage!))
+                    : const SizedBox(),
+              ),
+              GlassMorphism(
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.08,
+                  width: MediaQuery.of(context).size.width,
+                  child: TextButton(
+                    onPressed: () async {
+                      uploadBlog();
                     },
-                    icon: Row(
-                      children: [
-                        const Icon(
-                          Icons.add,
-                          size: 40,
-                          color: Colors.black87,
-                        ),
-                        Text(
-                          'Pick an image from here.',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(color: Colors.black87),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 300,
-                  width: 300,
-                  child: _selectedImage != null
-                      ? GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _selectedImage = null;
-                            });
-                          },
-                          child: Image.file(_selectedImage!))
-                      : const SizedBox(),
-                ),
-                GlassMorphism(
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.08,
-                    width: MediaQuery.of(context).size.width,
-                    child: TextButton(
-                      onPressed: () async {
-                        uploadBlog();
-                      },
-                      child: isUploading
-                          ? const Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.white70,
-                                strokeWidth: 6,
-                              ),
-                            )
-                          : Text(
-                              'Upload Blog',
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.headlineMedium,
+                    child: isUploading
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white70,
+                              strokeWidth: 6,
                             ),
-                    ),
+                          )
+                        : Text(
+                            'Upload Blog',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

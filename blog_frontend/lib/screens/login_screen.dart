@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
             setAccessToken(
                 accessToken: value['data']['token']['access'],
                 user: value['user']);
-
+            debugPrint(value['data']['token']['access']);
             if (context.mounted) {
               Navigator.pushReplacement(
                 context,
