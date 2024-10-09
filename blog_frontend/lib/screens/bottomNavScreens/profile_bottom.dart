@@ -1,5 +1,7 @@
 import 'package:blog_frontend/api/api_services.dart';
+import 'package:blog_frontend/components/custom_page_route.dart';
 import 'package:blog_frontend/models/blog_model.dart';
+import 'package:blog_frontend/screens/update_screen.dart';
 import 'package:flutter/material.dart';
 
 class ProfileBottom extends StatefulWidget {
@@ -43,6 +45,25 @@ class _ProfileBottomState extends State<ProfileBottom> {
                   Text(snapshot.data![index].blogText!),
                 ],
               ),
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  CustomPageRoute(
+                    route: UpdateScreen(
+                      title: snapshot.data![index].title!,
+                      blogText: snapshot.data![index].blogText!,
+                      imageURL: apiLink + snapshot.data![index].mainImage!,
+                      uid: snapshot.data![index].uid!,
+                    ),
+                  ),
+                ).then(
+                  (value) {
+                    setState(() {
+                      //
+                    });
+                  },
+                );
+              },
               onLongPress: () async {
                 await ApiServices()
                     .deleteBlog(uid: snapshot.data![index].uid!)

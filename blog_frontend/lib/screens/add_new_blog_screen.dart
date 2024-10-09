@@ -36,16 +36,6 @@ class _AddNewBlogScreenState extends State<AddNewBlogScreen> {
     setState(() {
       isUploading = true;
     });
-    // var request = http.MultipartRequest(
-    //     "POST", Uri.parse('${apiLink}api/home/blog-user/'));
-    // request.fields['title'] = titleController.text;
-    // request.fields['blog_text'] = blogTextController.text;
-    // request.fields['user'] = user.toString();
-    // request.headers['Authorization'] = 'Bearer $at';
-    // debugPrint(at);
-    // request.files.add(
-    //     await http.MultipartFile.fromPath('main_image', _selectedImage!.path));
-    // await request.send();
     await ApiServices()
         .uploadBlog(
             title: titleController.text,
@@ -53,9 +43,7 @@ class _AddNewBlogScreenState extends State<AddNewBlogScreen> {
             selectedImage: _selectedImage!)
         .then(
       (value) {
-        setState(() {
-          isUploading = false;
-        });
+        Navigator.pop(context);
       },
     );
   }
@@ -123,7 +111,11 @@ class _AddNewBlogScreenState extends State<AddNewBlogScreen> {
                             _selectedImage = null;
                           });
                         },
-                        child: Image.file(_selectedImage!))
+                        child: Image.file(
+                          _selectedImage!,
+                          height: 200,
+                          width: 400,
+                        ))
                     : const SizedBox(),
               ),
               GlassMorphism(
@@ -132,7 +124,9 @@ class _AddNewBlogScreenState extends State<AddNewBlogScreen> {
                   width: MediaQuery.of(context).size.width,
                   child: TextButton(
                     onPressed: () async {
-                      uploadBlog();
+                      if (_formkey.currentState!.validate()) {
+                        uploadBlog();
+                      }
                     },
                     child: isUploading
                         ? const Center(

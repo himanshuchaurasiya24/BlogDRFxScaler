@@ -72,12 +72,18 @@ class _HomeState extends State<Home> {
           ],
         ),
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
+          onPressed: () async {
             Navigator.push(
               context,
               CustomPageRoute(
                 route: const AddNewBlogScreen(),
               ),
+            ).then(
+              (value) {
+                setState(() {
+                  activePage = 1;
+                });
+              },
             );
           },
           label: const Text('new blog'),

@@ -10,6 +10,39 @@ import 'package:http/http.dart' as http;
 const apiLink = 'http://127.0.0.1:8000/';
 
 class ApiServices {
+  Future<void> updateBlogWithoutImageUpdate(
+      {required String title, required String blogText, required String uid}) async {
+    int user = pref.getInt('user') ?? 0;
+    String at = pref.getString('at') ?? '';
+    var request = http.MultipartRequest(
+        "PATCH", Uri.parse('${apiLink}api/home/blog-user/'));
+    request.fields['title'] = title;
+    request.fields['uid'] = uid;
+    request.fields['blog_text'] = blogText;
+    request.fields['user'] = user.toString();
+    request.headers['Authorization'] = 'Bearer $at';
+    await request.send();
+  }
+
+  Future<void> updateBlogWithImageUpdate(
+      {required String title,
+      required String blogText,
+      required String uid,
+      required File selectedImage}) async {
+    int user = pref.getInt('user') ?? 0;
+    String at = pref.getString('at') ?? '';
+    var request = http.MultipartRequest(
+        "PATCH", Uri.parse('${apiLink}api/home/blog-user/'));
+    request.fields['title'] = title;
+    request.fields['uid'] = uid;
+    request.fields['blog_text'] = blogText;
+    request.fields['user'] = user.toString();
+    request.headers['Authorization'] = 'Bearer $at';
+    request.files.add(
+        await http.MultipartFile.fromPath('main_image', selectedImage.path));
+    await request.send();
+  }
+
   Future<void> uploadBlog(
       {required String title,
       required String blogText,
