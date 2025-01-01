@@ -1,5 +1,5 @@
 install djangorestframework
-in api.urls that will be outside the project folder include all the routes for the api's
+in api.urls that will be outside the  project folder include all the routes for the api's
 in main app urls.py add route like 
 path('api/', include('api.urls')) # import include from the Django.urls
 
